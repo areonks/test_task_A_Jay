@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Client extends Model
 {
     use HasFactory;
+
+    protected $withCount = ['users', 'activeUsers', 'inActiveUsers'];
 
     protected $fillable = [
         'client_name',
@@ -28,6 +31,11 @@ class Client extends Model
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    public function scopeWithQuseryParams(Builder $builder, $query)
+    {
+        return $query['colum'] ? $builder->where($query['colum'], 'LIKE', "%$query[query]%") : $builder;
     }
 
     public function activeUsers()

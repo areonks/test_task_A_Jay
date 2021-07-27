@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\GetClientsRequest;
 use App\Http\Requests\StoreClientRequest;
+use App\Http\Resources\ClientResource;
 use App\Models\Client;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -10,25 +12,13 @@ use Illuminate\Support\Facades\Cache;
 
 class ClientController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+
+    public function index(GetClientsRequest $request)
     {
-        //
+        $sortParams = $request['sortBy'] ?: ['id', 'DESC'];
+        return ClientResource::collection(Client::withQuseryParams($request)->orderBy($sortParams[0], $sortParams[1])->paginate(3));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     public function store(StoreClientRequest $request)
     {
@@ -51,7 +41,7 @@ class ClientController extends Controller
             'latitude' => $geocod->lat,
             'longitude' => $geocod->lng,
             'start_validity' => Carbon::now(),
-            'end_validity' => Carbon::now()->addDays(14)
+            'end_validity' => Carbon::now()->addDays(15)
         ];
 
         $client = Client::create(array_merge($request->validated(), $additionalData));
@@ -59,48 +49,5 @@ class ClientController extends Controller
         return response()->noContent();
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param \App\Models\Client $client
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Client $client)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param \App\Models\Client $client
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Client $client)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Client $client
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Client $client)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param \App\Models\Client $client
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Client $client)
-    {
-        //
-    }
 }
