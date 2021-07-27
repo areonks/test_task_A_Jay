@@ -42,9 +42,9 @@ class GetClientsRequest extends FormRequest
         ];
 
         return [
-            'colum' => [Rule::in($fieldList)],
+            'column' => [Rule::in($fieldList), 'nullable'],
             'query' => 'nullable|string|max:100',
-            'sortBy.0' =>[Rule::in($fieldList)],
+            'sortBy.0' =>[Rule::in($fieldList), 'nullable'],
             'sortBy.1' => "in:desc,asc"
         ];
     }

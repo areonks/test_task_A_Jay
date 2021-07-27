@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Client extends Model
 {
@@ -35,7 +37,8 @@ class Client extends Model
 
     public function scopeWithQuseryParams(Builder $builder, $query)
     {
-        return $query['colum'] ? $builder->where($query['colum'], 'LIKE', "%$query[query]%") : $builder;
+        $searchParams = array_key_exists('query', $query) ? $query['query'] : '';
+        return $query['column'] ? $builder->where($query['column'], 'LIKE', "%$searchParams%") : $builder;
     }
 
     public function activeUsers()
@@ -46,5 +49,32 @@ class Client extends Model
     public function inActiveUsers()
     {
         return $this->users()->where('status', 'inactive');
+    }
+
+    public function parseGeoData()
+    {
+        $cacheKey = $this->zip . $this->address1 . $this->address2;
+        $geoData = Cache::rememberForever($cacheKey, function () {
+            $geocode = \GoogleMaps::load('geocoding')
+                ->setEndpoint('json')
+                ->setParam(['address' => $this->address1 . $this->address2,
+                    'components' => [
+                        'administrative_area' => $this->state,
+                        'country' => $this->country,
+                        'city' => $this->city,
+                    ]
+                ])
+                ->get();
+            return json_decode($geocode)->results[0]->geometry->location;
+        });
+        $this->attributes= array_merge($this->attributes, [
+                'latitude' => $geoData->lat,
+                'longitude' => $geoData->lng,
+                'start_validity' => Carbon::now(),
+                'end_validity' => Carbon::now()->addDays(15)
+            ]
+
+        ) ;
+
     }
 }
