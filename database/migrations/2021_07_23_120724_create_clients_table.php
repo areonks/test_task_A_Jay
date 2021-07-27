@@ -15,7 +15,7 @@ class CreateClientsTable extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('client_name', 100);
+            $table->string('client_name', 100)->unique();
             $table->text('address1');
             $table->text('address2');
             $table->string('city', 100);
@@ -23,8 +23,8 @@ class CreateClientsTable extends Migration
             $table->string('country', 100);
             $table->double('latitude');
             $table->double('longitude');
-            $table->string('phone_no1', 100);
-            $table->string('phone_no2', 100)->nullable();
+            $table->string('phone_no1', 100)->unique();
+            $table->string('phone_no2', 100)->nullable()->unique();
             $table->string('zip', 100);
             $table->date('start_validity');
             $table->date('end_validity');

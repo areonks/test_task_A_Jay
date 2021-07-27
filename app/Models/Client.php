@@ -19,6 +19,10 @@ class Client extends Model
         'phone_no1',
         'phone_no2',
         'zip',
+        'longitude',
+        'latitude',
+        'start_validity',
+        'end_validity',
     ];
 
     public function users()

@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreClientRequest;
 use App\Models\Client;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Carbon\Carbon;
 
 class ClientController extends Controller
 {
@@ -30,35 +30,33 @@ class ClientController extends Controller
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(StoreClientRequest $request)
     {
-
-
-//        $map = \GoogleMaps::load('geocoding')
-//            ->setEndpoint('json')
-//            ->setParam(['address' => 'rock haven way',
-//                'components' => [
-//                    'administrative_area' => 'VA',
-//                    'country' => 'US',
-//                    'city' =>'Sterling',
-//            ]
-//            ])
-//            ->get();
-        $response = Cache::put('bar', 'baz', 200);
-        $value = Cache::get('bar');
-        $now = Carbon::now()->addDays(15);
-        $testDatae = Cache::remember('sdfhg', $now, function () use ($now) {
-            return ('sedfhb');
+        $cacheKey = $request->zip . $request->address1 . $request->address2;
+        $geocod = Cache::rememberForever($cacheKey, function () use ($request) {
+            $geocod = \GoogleMaps::load('geocoding')
+                ->setEndpoint('json')
+                ->setParam(['address' => $request->address1 . $request->address2,
+                    'components' => [
+                        'administrative_area' => $request->state,
+                        'country' => $request->country,
+                        'city' => $request->city,
+                    ]
+                ])
+                ->get();
+            return json_decode($geocod)->results[0]->geometry->location;
         });
-//        dd(json_decode($map)->results[0]->geometry->location->lat);
 
-        return $now;
+        $additionalData = [
+            'latitude' => $geocod->lat,
+            'longitude' => $geocod->lng,
+            'start_validity' => Carbon::now(),
+            'end_validity' => Carbon::now()->addDays(14)
+        ];
+
+        $client = Client::create(array_merge($request->validated(), $additionalData));
+        $client->users()->create($request->validated()['user']);
+        return response()->noContent();
     }
 
     /**
