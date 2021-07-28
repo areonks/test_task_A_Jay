@@ -3,8 +3,8 @@
 namespace App\Repositories;
 interface ClientRepositoryInterface
 {
-    public function getAllSearchedUsing($request);
+    public function getAll($searchParams);
 
-    public function post($request);
+    public function create($newClient);
 
 }

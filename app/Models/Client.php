@@ -51,7 +51,7 @@ class Client extends Model
         return $this->users()->where('status', 'inactive');
     }
 
-    public function setAdditionalAttributes()
+    public function setGeoDataAttributes()
     {
         $cacheKey = $this->zip . $this->address1 . $this->address2;
         $geoData = Cache::rememberForever($cacheKey, function () {
@@ -67,14 +67,22 @@ class Client extends Model
                 ->get();
             return json_decode($geocode)->results[0]->geometry->location;
         });
-        $this->attributes= array_merge($this->attributes, [
+        $this->attributes = array_merge($this->attributes, [
                 'latitude' => $geoData->lat,
                 'longitude' => $geoData->lng,
                 'start_validity' => Carbon::now(),
                 'end_validity' => Carbon::now()->addDays(15)
             ]
 
-        ) ;
+        );
 
+    }
+    public function setValidityDates(){
+        $this->attributes = array_merge($this->attributes, [
+                'start_validity' => Carbon::now(),
+                'end_validity' => Carbon::now()->addDays(15)
+            ]
+
+        );
     }
 }

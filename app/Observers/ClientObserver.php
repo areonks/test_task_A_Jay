@@ -6,7 +6,9 @@ use App\Models\Client;
 
 class ClientObserver
 {
-    public function creating (Client $client){
-        $client->setAdditionalAttributes();
+    public function creating(Client $client)
+    {
+        $client->setGeoDataAttributes();
+        $client->setValidityDates();
     }
 }
