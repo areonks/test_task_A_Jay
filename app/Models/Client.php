@@ -35,7 +35,7 @@ class Client extends Model
         return $this->hasMany(User::class);
     }
 
-    public function scopeWithQuseryParams(Builder $builder, $query)
+    public function scopeWithQueryParams(Builder $builder, $query)
     {
         $searchParams = array_key_exists('query', $query) ? $query['query'] : '';
         return $query['column'] ? $builder->where($query['column'], 'LIKE', "%$searchParams%") : $builder;
@@ -51,7 +51,7 @@ class Client extends Model
         return $this->users()->where('status', 'inactive');
     }
 
-    public function parseGeoData()
+    public function setAdditionalAttributes()
     {
         $cacheKey = $this->zip . $this->address1 . $this->address2;
         $geoData = Cache::rememberForever($cacheKey, function () {

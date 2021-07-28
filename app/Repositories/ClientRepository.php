@@ -7,10 +7,10 @@ use App\Models\Client;
 class ClientRepository implements ClientRepositoryInterface
 {
 
-    public function getSearched($request)
+    public function getAllSearchedUsing($request)
     {
         $sortParams = $request['sortBy'] ?: ['id', 'DESC'];
-        return Client::withQuseryParams($request)->orderBy($sortParams[0], $sortParams[1])->paginate(3);
+        return Client::withQueryParams($request)->orderBy($sortParams[0], $sortParams[1])->paginate(3);
     }
 
     public function post($request)

@@ -20,7 +20,7 @@ class ClientController extends Controller
 
     public function index(GetClientsRequest $request)
     {
-        $clients = $this->clientRepository->getSearched($request->validated());
+        $clients = $this->clientRepository->getAllSearchedUsing($request->validated());
         return ClientResource::collection($clients);
     }
 
