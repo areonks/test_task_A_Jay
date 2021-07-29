@@ -38,7 +38,7 @@ class Client extends Model
     public function scopeWithQueryParams(Builder $builder, $query)
     {
         $searchParams = array_key_exists('query', $query) ? $query['query'] : '';
-        return $query['column'] ? $builder->where($query['column'], 'LIKE', "%$searchParams%") : $builder;
+        return array_key_exists('column', $query) ? $builder->where($query['column'], 'LIKE', "%$searchParams%") : $builder;
     }
 
     public function activeUsers()
@@ -77,7 +77,9 @@ class Client extends Model
         );
 
     }
-    public function setValidityDates(){
+
+    public function setValidityDates()
+    {
         $this->attributes = array_merge($this->attributes, [
                 'start_validity' => Carbon::now(),
                 'end_validity' => Carbon::now()->addDays(15)
